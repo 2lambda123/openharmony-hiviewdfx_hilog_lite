@@ -14,8 +14,8 @@
  */
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "hilog_command.h"
 
@@ -25,52 +25,54 @@
 #undef LOG_TAG
 #define LOG_TAG "hilogcat"
 
-int main(int argc, char *argv[])
-{
-    int ret;
-    bool printFlag = true;
-    if (argc > 1) {
-        ret = HilogCmdProc(LOG_TAG, argc, argv);
-        if (ret == -1 || g_hiviewConfig.silenceMod == SILENT_MODE_ON) {
-            return 0;
-        }
+int main(int argc, char *argv[]) {
+  int ret;
+  bool printFlag = true;
+  if (argc > 1) {
+    ret = HilogCmdProc(LOG_TAG, argc, argv);
+    if (ret == -1 || g_hiviewConfig.silenceMod == SILENT_MODE_ON) {
+      return 0;
     }
-    int fd = open(HILOG_DRIVER, O_RDONLY);
-    if (fd < 0) {
-        HILOG_ERROR(LOG_CORE, "open hilog driver failed\n");
-        return 0;
-    }
-    while (1) {
-        char buf[HILOG_LOGBUFFER] = {0};
-        ret = read(fd, buf, HILOG_LOGBUFFER);
-        if (ret < sizeof(struct HiLogEntry)) {
-            continue;
-        }
-        struct HiLogEntry *head = (struct HiLogEntry *)buf;
-
-        time_t rawtime;
-        struct tm *info = NULL;
-        struct tm nowTime = {0};
-        unsigned int sec = head->sec;
-        rawtime = (time_t)sec;
-        /* Get local time */
-        info = localtime_r(&rawtime, &nowTime);
-
-        printFlag = FilterLevelLog(g_hiviewConfig.level, *(head->msg));
-        if (!printFlag) {
-            continue;
-        }
-#define MODULE_OFFSET 2
-        printFlag = FilterModuleLog(g_hiviewConfig.logOutputModule, (head->msg) + MODULE_OFFSET);
-        if (!printFlag) {
-            continue;
-        }
-        if (info == NULL) {
-            continue;
-        }
-        buf[HILOG_LOGBUFFER - 1] = '\0';
-        printf("%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour, info->tm_min,
-               info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
-    }
+  }
+  int fd = open(HILOG_DRIVER, O_RDONLY);
+  if (fd < 0) {
+    HILOG_ERROR(LOG_CORE, "open hilog driver failed\n");
     return 0;
+  }
+  while (1) {
+    char buf[HILOG_LOGBUFFER] = {0};
+    ret = read(fd, buf, HILOG_LOGBUFFER);
+    if (ret < sizeof(struct HiLogEntry)) {
+      continue;
+    }
+    struct HiLogEntry *head = (struct HiLogEntry *)buf;
+
+    time_t rawtime;
+    struct tm *info = NULL;
+    struct tm nowTime = {0};
+    unsigned int sec = head->sec;
+    rawtime = (time_t)sec;
+    /* Get local time */
+    info = localtime_r(&rawtime, &nowTime);
+
+    printFlag = FilterLevelLog(g_hiviewConfig.level, *(head->msg));
+    if (!printFlag) {
+      continue;
+    }
+#define MODULE_OFFSET 2
+    printFlag = FilterModuleLog(g_hiviewConfig.logOutputModule,
+                                (head->msg) + MODULE_OFFSET);
+    if (!printFlag) {
+      continue;
+    }
+    if (info == NULL) {
+      continue;
+    }
+    buf[HILOG_LOGBUFFER - 1] = '\0';
+    printf("%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1,
+           info->tm_mday, info->tm_hour, info->tm_min, info->tm_sec,
+           head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId,
+           head->msg);
+  }
+  return 0;
 }
