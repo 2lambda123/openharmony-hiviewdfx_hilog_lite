@@ -39,18 +39,18 @@ static void HiLogInit(void)
 
     /* The module that is not registered cannot print the log. */
     if (HiLogRegisterModule(HILOG_MODULE_HIVIEW, "HIVIEW") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_SAMGR, "SAMGR") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_UPDATE, "UPDATE") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_ACE, "ACE") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_AAFWK, "AAFWK") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_APP, "APP") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_GRAPHIC, "GRAPHIC") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_MEDIA, "MEDIA") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_DMS, "DMS") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_SEN, "SEN") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_SCY, "SCY") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_SOFTBUS, "SOFTBUS") == FALSE ||
-        HiLogRegisterModule(HILOG_MODULE_POWERMGR, "POWERMGR") == FALSE) {
+            HiLogRegisterModule(HILOG_MODULE_SAMGR, "SAMGR") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_UPDATE, "UPDATE") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_ACE, "ACE") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_AAFWK, "AAFWK") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_APP, "APP") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_GRAPHIC, "GRAPHIC") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_MEDIA, "MEDIA") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_DMS, "DMS") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_SEN, "SEN") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_SCY, "SCY") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_SOFTBUS, "SOFTBUS") == FALSE ||
+            HiLogRegisterModule(HILOG_MODULE_POWERMGR, "POWERMGR") == FALSE) {
         return;
     }
 
@@ -63,7 +63,7 @@ CORE_INIT_PRI(HiLogInit, 0);
 static boolean CheckParameters(uint8 module, uint8 level)
 {
     if ((level < g_hiviewConfig.level) ||  (level < HILOG_COMPILE_LEVEL)
-        || (module >= HILOG_MODULE_MAX) || (g_logModuleInfo[module].name == NULL)) {
+            || (module >= HILOG_MODULE_MAX) || (g_logModuleInfo[module].name == NULL)) {
         return FALSE;
     }
 
@@ -113,7 +113,7 @@ void HiLogPrintf(uint8 module, uint8 level, const char *nums, const char *fmt, .
     }
 
     if (g_hiviewConfig.logSwitch == HIVIEW_FEATURE_OFF || !CheckParameters(module, level) ||
-        !LOG_IS_OUTPUT(module)) {
+            !LOG_IS_OUTPUT(module)) {
         return;
     }
 
@@ -146,7 +146,7 @@ void HILOG_HashPrintf(uint8 module, uint8 level, const char *nums, uint32 hash, 
     }
 
     if (g_hiviewConfig.logSwitch == HIVIEW_FEATURE_OFF || !CheckParameters(module, level) ||
-        !LOG_IS_OUTPUT(module)) {
+            !LOG_IS_OUTPUT(module)) {
         return;
     }
 

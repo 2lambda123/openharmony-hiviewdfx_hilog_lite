@@ -102,7 +102,7 @@ void InitLogOutput(void)
         type = HIVIEW_LOG_BIN_FILE;
     }
     if (InitHiviewFile(&g_logFile, type,
-        (HIVIEW_LOG_FILE_SIZE / sizeof(HiLogContent)) * sizeof(HiLogContent)) == FALSE) {
+                       (HIVIEW_LOG_FILE_SIZE / sizeof(HiLogContent)) * sizeof(HiLogContent)) == FALSE) {
         HILOG_ERROR(HILOG_MODULE_HIVIEW, "Open file[%d] failed.", HIVIEW_LOG_BIN_FILE);
     }
     g_logFile.mutex = g_outputLogInfo.mutex;
@@ -180,17 +180,17 @@ void OutputLog(uint8 module, const uint8 *data, uint32 len)
     }
     if (g_logCache.usedSize >= HIVIEW_HILOG_FILE_BUF_SIZE) {
         switch (opt) {
-            case OUTPUT_OPTION_TEXT_FILE:
-                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
-                break;
-            case OUTPUT_OPTION_BIN_FILE:
-                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
-                break;
-            case OUTPUT_OPTION_FLOW:
-                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
-                break;
-            default:
-                break;
+        case OUTPUT_OPTION_TEXT_FILE:
+            HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
+            break;
+        case OUTPUT_OPTION_BIN_FILE:
+            HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
+            break;
+        case OUTPUT_OPTION_FLOW:
+            HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
+            break;
+        default:
+            break;
         }
     }
 
@@ -209,7 +209,7 @@ static void OutputLogRealtime(const Request *req)
     (void)req;
 
     while (ReadFromCache(&g_logCache, (uint8 *)&(logContent.commonContent),
-        sizeof(HiLogCommon)) == sizeof(HiLogCommon)) {
+                         sizeof(HiLogCommon)) == sizeof(HiLogCommon)) {
         if (logContent.commonContent.head != LOG_INFO_HEAD) {
             DiscardCacheData(&g_logCache);
             HILOG_ERROR(HILOG_MODULE_HIVIEW, "Discard cache[%d] data.", LOG_CACHE);
@@ -242,7 +242,7 @@ static void OutputLog2TextFile(const Request *req)
 
     int32 len;
     while (ReadFromCache(&g_logCache, (uint8 *)&(logContent.commonContent),
-        sizeof(HiLogCommon)) == sizeof(HiLogCommon)) {
+                         sizeof(HiLogCommon)) == sizeof(HiLogCommon)) {
         if (logContent.commonContent.head != LOG_INFO_HEAD) {
             DiscardCacheData(&g_logCache);
             HILOG_ERROR(HILOG_MODULE_HIVIEW, "Discard cache[%d] data.", LOG_CACHE);
@@ -381,8 +381,8 @@ static int32 LogCommonFmt(char *outStr, int32 outStrLen, const HiLogCommon *comm
     sec = nowTime.tm_sec;
     level = CLEAR_HASH_FLAG(commonContentPtr->level);
     ret = snprintf_s(outStr, outStrLen, outStrLen - 1, "%04d-%02d-%02d %02d:%02d:%02d 0 %d %c %d/%s: ",
-        year, month, day, hour, min, sec, commonContentPtr->task, g_logLevelInfo[level],
-        commonContentPtr->module, HiLogGetModuleName(commonContentPtr->module));
+                     year, month, day, hour, min, sec, commonContentPtr->task, g_logLevelInfo[level],
+                     commonContentPtr->module, HiLogGetModuleName(commonContentPtr->module));
 
     return ret;
 }
@@ -411,7 +411,7 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
         while (fmt[i] != 0 && t < sizeof(fmtStr) - 1) {
             /* %s %ms %-ms %m.ns %-m.ns convert to %p */
             if ((fmt[i] == 's' || fmt[i] == 'S') &&
-                (fmt[i - 1] == '%' || (fmt[i - 1] >= '0' && fmt[i - 1] <= '9'))) {
+                    (fmt[i - 1] == '%' || (fmt[i - 1] >= '0' && fmt[i - 1] <= '9'))) {
                 fmtStr[1] = 'p';
                 fmtStr[FMT_CONVERT_TRMINATOR] = 0;
                 i++;
@@ -426,7 +426,7 @@ static int32 LogValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent *log
         }
         if (valueIndex < valNum) {
             len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
-                fmtStr, logContentPtr->values[valueIndex]);
+                             fmtStr, logContentPtr->values[valueIndex]);
             if (len < 0) {
                 break;
             }
@@ -442,39 +442,39 @@ static int32 LogDebugValuesFmt(char *desStrPtr, int32 desLen, const HiLogContent
 {
     int32 ret = 0;
     switch (logContentPtr->commonContent.valueNumber) {
-        case LOG_MULTI_PARA_0:
-            ret = strncpy_s(desStrPtr, desLen, logContentPtr->commonContent.fmt, desLen - 1);
-            break;
-        case LOG_MULTI_PARA_1:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
-                logContentPtr->values[0]);
-            break;
-        case LOG_MULTI_PARA_2:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
-                logContentPtr->values[0], logContentPtr->values[1]);
-            break;
-        case LOG_MULTI_PARA_3:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
-                logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2]);
-            break;
-        case LOG_MULTI_PARA_4:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
-                logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
-                logContentPtr->values[LOG_MULTI_PARA_3]);
-            break;
-        case LOG_MULTI_PARA_5:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
-                logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
-                logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4]);
-            break;
-        case LOG_MULTI_PARA_MAX:
-            ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
-                logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
-                logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4],
-                logContentPtr->values[LOG_MULTI_PARA_5]);
-            break;
-        default:
-            break;
+    case LOG_MULTI_PARA_0:
+        ret = strncpy_s(desStrPtr, desLen, logContentPtr->commonContent.fmt, desLen - 1);
+        break;
+    case LOG_MULTI_PARA_1:
+        ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+                         logContentPtr->values[0]);
+        break;
+    case LOG_MULTI_PARA_2:
+        ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+                         logContentPtr->values[0], logContentPtr->values[1]);
+        break;
+    case LOG_MULTI_PARA_3:
+        ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+                         logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2]);
+        break;
+    case LOG_MULTI_PARA_4:
+        ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+                         logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
+                         logContentPtr->values[LOG_MULTI_PARA_3]);
+        break;
+    case LOG_MULTI_PARA_5:
+        ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+                         logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
+                         logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4]);
+        break;
+    case LOG_MULTI_PARA_MAX:
+        ret = snprintf_s(desStrPtr, desLen, desLen - 1, logContentPtr->commonContent.fmt,
+                         logContentPtr->values[0], logContentPtr->values[1], logContentPtr->values[LOG_MULTI_PARA_2],
+                         logContentPtr->values[LOG_MULTI_PARA_3], logContentPtr->values[LOG_MULTI_PARA_4],
+                         logContentPtr->values[LOG_MULTI_PARA_5]);
+        break;
+    default:
+        break;
     }
 
     if (ret < 0) {
@@ -488,7 +488,7 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
     int32 outLen = 0;
     uint32 paraNum = logContentPtr->commonContent.valueNumber;
     int32 len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
-        "hash:%u para:", (uint32)logContentPtr->commonContent.fmt);
+                           "hash:%u para:", (uint32)logContentPtr->commonContent.fmt);
     if (len < 0) {
         return len;
     }
@@ -496,7 +496,7 @@ static int32 LogValuesFmtHash(char *desStrPtr, int32 desLen, const HiLogContent 
 
     for (uint32 i = 0; i < paraNum && i < LOG_MULTI_PARA_MAX; i++) {
         len = snprintf_s(&desStrPtr[outLen], desLen - outLen, desLen - outLen - 1,
-            "%u ", logContentPtr->values[i]);
+                         "%u ", logContentPtr->values[i]);
         if (len < 0) {
             return len;
         }
@@ -511,31 +511,31 @@ void FlushLog(boolean syncFlag)
     if (g_logCache.usedSize > 0) {
         if (syncFlag == FALSE) {
             switch (opt) {
-                case OUTPUT_OPTION_TEXT_FILE:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
-                    break;
-                case OUTPUT_OPTION_BIN_FILE:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
-                    break;
-                case OUTPUT_OPTION_FLOW:
-                    HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
-                    break;
-                default:
-                    break;
+            case OUTPUT_OPTION_TEXT_FILE:
+                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_TEXT_FILE, 0);
+                break;
+            case OUTPUT_OPTION_BIN_FILE:
+                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_BIN_FILE, 0);
+                break;
+            case OUTPUT_OPTION_FLOW:
+                HiviewSendMessage(HIVIEW_SERVICE, HIVIEW_MSG_OUTPUT_LOG_FLOW, 0);
+                break;
+            default:
+                break;
             }
         } else {
             switch (opt) {
-                case OUTPUT_OPTION_TEXT_FILE:
-                    OutputLog2TextFile(NULL);
-                    break;
-                case OUTPUT_OPTION_BIN_FILE:
-                    OutputLog2BinFile(NULL);
-                    break;
-                case OUTPUT_OPTION_FLOW:
-                    OutputLogRealtime(NULL);
-                    break;
-                default:
-                    break;
+            case OUTPUT_OPTION_TEXT_FILE:
+                OutputLog2TextFile(NULL);
+                break;
+            case OUTPUT_OPTION_BIN_FILE:
+                OutputLog2BinFile(NULL);
+                break;
+            case OUTPUT_OPTION_FLOW:
+                OutputLogRealtime(NULL);
+                break;
+            default:
+                break;
             }
         }
     }
