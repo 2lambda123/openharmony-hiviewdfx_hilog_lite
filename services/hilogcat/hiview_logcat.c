@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         }
         buf[HILOG_LOGBUFFER - 1] = '\0';
         printf("%02d-%02d %02d:%02d:%02d.%03d %d %d %s\n", info->tm_mon + 1, info->tm_mday, info->tm_hour, info->tm_min,
-            info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
+               info->tm_sec, head->nsec / NANOSEC_PER_MIRCOSEC, head->pid, head->taskId, head->msg);
     }
     return 0;
 }
