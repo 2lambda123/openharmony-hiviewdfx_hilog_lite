@@ -16,8 +16,8 @@
 #ifndef HOS_LITE_HIVIEW_OUTPUT_LOG_H
 #define HOS_LITE_HIVIEW_OUTPUT_LOG_H
 
-#include "ohos_types.h"
 #include "log.h"
+#include "ohos_types.h"
 
 #ifdef __cplusplus
 #if __cplusplus
